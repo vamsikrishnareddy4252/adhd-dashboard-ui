@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #FFFBF5;
+  --bg2: #FFF6EC;
+  --surface: #FFFFFF;
+  --card: #FFFDF9;
+  --border: #EAD9C8;
+  --border2: #F0E4D4;
+  --orange: #D97706;
+  --orange-light: #FEF3C7;
+  --orange-mid: #FDE68A;
+  --green: #059669;
+  --green-light: #D1FAE5;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --blue: #2563EB;
+  --blue-light: #DBEAFE;
+  --purple: #7C3AED;
+  --purple-light: #EDE9FE;
+  --text: #1C1917;
+  --text2: #44403C;
+  --muted: #78716C;
+  --dim: #A8A29E;
+  --shadow: rgba(120,85,40,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  position: sticky; top:0; z-index:100;
+  background: rgba(255,251,245,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 1rem;
+  box-shadow: 0 1px 12px var(--shadow);
+}
+.nav-inner {
+  max-width: 1080px; margin: 0 auto;
+  display: flex; align-items: center; gap: 0.4rem;
+  overflow-x: auto; scrollbar-width: none;
+  padding: 0.65rem 0;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-logo {
+  font-family: 'Lora', serif;
+  font-weight: 700; font-size: 1rem;
+  color: var(--orange); white-space: nowrap;
+  margin-right: 0.75rem; flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+.tab-btn {
+  background: none;
+  border: 1.5px solid transparent;
+  color: var(--muted);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem; font-weight: 500;
+  white-space: nowrap; flex-shrink: 0;
+  transition: all 0.18s;
+}
+.tab-btn:hover { color: var(--orange); border-color: var(--border); }
+.tab-btn.active {
+  background: var(--orange); color: #fff;
+  border-color: var(--orange); font-weight: 700;
+}
+
+/* LAYOUT */
+.page { display:none; max-width: 1080px; margin: 0 auto; padding: 2rem 1rem 5rem; }
+.page.active { display: block; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
+
+/* TYPOGRAPHY */
+h1.hero-title {
+  font-family: 'Lora', serif;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  font-weight: 700; line-height: 1.15;
+  color: var(--text); letter-spacing: -0.02em;
+}
+h1.hero-title em { font-style: italic; color: var(--orange); }
+h2.sec { 
+  font-family: 'Lora', serif;
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--text); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+h2.sec .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--orange); flex-shrink: 0;
+}
+h3.card-head {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); margin-bottom: 0.85rem;
+}
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 14px; padding: 1.25rem;
+  margin-bottom: 1.15rem;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.card-amber { border-left: 4px solid var(--orange); background: #FFFDF9; }
+.card-green { border-left: 4px solid var(--green); }
+.card-red { border-left: 4px solid var(--red); }
+.card-blue { border-left: 4px solid var(--blue); }
+.card-purple { border-left: 4px solid var(--purple); }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #FFF8EE 0%, #FFFBF5 60%, #F0FDF4 100%);
+  border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '🧠';
+  position: absolute; right: 2rem; top: 1.5rem;
+  font-size: 5rem; opacity: 0.12;
+}
+.hero-badge {
+  display: inline-block;
+  background: var(--orange-light);
+  border: 1.5px solid #FCD34D;
+  color: #92400E;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 0.25rem 0.75rem; border-radius: 999px;
+  margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.hero p {
+  color: var(--text2); max-width: 540px;
+  line-height: 1.65; font-size: 0.95rem; margin-top: 0.75rem;
+}
+.stat-row {
+  display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;
+}
+.stat-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 0.6rem 1rem;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem; font-weight: 600; color: var(--orange);
+}
+.stat-label { font-size: 0.72rem; color: var(--muted); }
+
+/* POWER GRID */
+.power-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.power-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px; border: 1.5px solid;
+}
+.power-item.good { background: #F0FDF4; border-color: #BBF7D0; }
+.power-item.bad { background: #FFF7ED; border-color: #FED7AA; }
+.power-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.power-text { font-size: 0.82rem; line-height: 1.4; color: var(--text2); }
+.power-text strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 0.15rem; }
+
+/* SESSION CARDS */
+.session-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.session-card {
+  display: grid; grid-template-columns: 90px 1fr;
+  border: 1.5px solid var(--border2); border-radius: 12px;
+  overflow: hidden; background: var(--surface);
+  box-shadow: 0 1px 6px var(--shadow);
+}
+.session-time {
+  background: var(--orange); color: #fff;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1rem 0.5rem; text-align: center;
+}
+.session-time .emoji { font-size: 1.4rem; }
+.session-time .label {
+  font-size: 0.62rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-top: 0.25rem; opacity: 0.9;
+}
+.session-body { padding: 1rem 1.1rem; }
+.session-body h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+.session-body p { font-size: 0.78rem; color: var(--text2); line-height: 1.5; }
+.session-hack {
+  margin-top: 0.5rem; padding: 0.4rem 0.65rem;
+  background: var(--orange-light); border-radius: 6px;
+  font-size: 0.72rem; color: #92400E;
+}
+.break-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.5rem 1rem; background: var(--green-light);
+  border: 1.5px solid #A7F3D0; border-radius: 8px;
+  font-size: 0.78rem; color: #065F46;
+}
+.break-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; background: var(--green); color: #fff;
+  padding: 0.15rem 0.5rem; border-radius: 4px; flex-shrink:0;
+}
+
+/* TRACKER */
+.tracker-sessions { display: flex; flex-direction: column; gap: 0.65rem; }
+.t-session {
+  border: 1.5px solid var(--border2); border-radius: 12px;
+  background: var(--surface); overflow: hidden;
+}
+.t-session-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; cursor: pointer;
+  background: var(--card);
+  border-bottom: 1.5px solid var(--border2);
+}
+.t-session-num {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--orange); color: #fff;
+  font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.t-session-title { font-weight: 600; font-size: 0.88rem; flex: 1; }
+.t-session-time { font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.t-done-btn {
+  padding: 0.25rem 0.75rem; border-radius: 6px;
+  border: 1.5px solid var(--border); background: none;
+  font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  color: var(--muted); transition: all 0.2s; flex-shrink: 0;
+}
+.t-done-btn.done { background: var(--green); color: #fff; border-color: var(--green); }
+.t-session-body { padding: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.t-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.t-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--dim); font-weight: 600; }
+.t-input {
+  border: 1.5px solid var(--border); border-radius: 7px;
+  padding: 0.45rem 0.65rem; font-size: 0.82rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg2); color: var(--text);
+  outline: none; transition: border 0.15s;
+}
+.t-input:focus { border-color: var(--orange); background: #fff; }
+.radio-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.radio-opt {
+  padding: 0.25rem 0.6rem; border-radius: 5px;
+  border: 1.5px solid var(--border); font-size: 0.72rem;
+  cursor: pointer; font-weight: 500; color: var(--muted);
+  transition: all 0.15s; user-select: none;
+}
+.radio-opt.sel { background: var(--orange); color: #fff; border-color: var(--orange); }
+.radio-opt.sel-g { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* SUMMARY BOX */
+.summary-box {
+  background: linear-gradient(135deg, #FFF8EE, #F0FDF4);
+  border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 1.25rem; margin-top: 1rem;
+}
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.summary-stat { text-align: center; }
+.summary-num { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 600; color: var(--orange); }
+.summary-sub { font-size: 0.68rem; color: var(--muted); }
+
+/* CHECKLIST */
+.checklist-group { margin-bottom: 1.5rem; }
+.cg-title {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--orange); margin-bottom: 0.65rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.cg-title::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+.check-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.55rem 0.85rem; margin-bottom: 0.35rem;
+  border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--border2); background: var(--surface);
+  transition: all 0.15s; user-select: none;
+}
+.check-item:hover { border-color: var(--orange); background: var(--orange-light); }
+.check-box {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 2px solid var(--dim); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; transition: all 0.18s;
+}
+.check-item.done .check-box {
+  background: var(--green); border-color: var(--green);
+}
+.check-item.done .check-box::after { content: '✓'; color: #fff; font-size: 0.7rem; font-weight: 700; }
+.check-text { font-size: 0.83rem; line-height: 1.4; }
+.check-item.done .check-text { text-decoration: line-through; color: var(--dim); }
+
+/* AFFIRMATION CARDS */
+.aff-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 0.9rem; }
+.aff-card {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 14px; padding: 1.25rem;
+  box-shadow: 0 2px 10px var(--shadow);
+  position: relative; overflow: hidden;
+}
+.aff-card::before {
+  content: attr(data-emoji);
+  position: absolute; right: 0.75rem; bottom: 0.5rem;
+  font-size: 2.5rem; opacity: 0.15;
+}
+.aff-card blockquote {
+  font-family: 'Lora', serif;
+  font-style: italic; font-size: 0.9rem;
+  line-height: 1.6; color: var(--text2);
+}
+.aff-card .aff-em { font-weight: 600; font-style: normal; color: var(--orange); }
+
+/* DECISION TREE */
+.dtree { display: flex; flex-direction: column; gap: 0.65rem; }
+.dtree-node {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 6px var(--shadow);
+}
+.dtree-trigger {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1rem; cursor: pointer;
+  font-size: 0.86rem; font-weight: 600;
+}
+.dtree-trigger:hover { background: var(--orange-light); }
+.dtree-icon { font-size: 1.1rem; flex-shrink: 0; }
+.dtree-arrow { margin-left: auto; font-size: 0.75rem; color: var(--dim); transition: transform 0.2s; }
+.dtree-node.open .dtree-arrow { transform: rotate(90deg); }
+.dtree-body {
+  display: none; padding: 0.85rem 1rem 1rem;
+  border-top: 1.5px solid var(--border2);
+  font-size: 0.82rem; color: var(--text2); line-height: 1.6;
+  background: var(--bg2);
+}
+.dtree-node.open .dtree-body { display: block; }
+.dtree-sol {
+  margin-top: 0.5rem; padding: 0.5rem 0.75rem;
+  border-radius: 8px; border-left: 3px solid var(--green);
+  background: var(--green-light); color: #065F46; font-size: 0.8rem;
+}
+
+/* PROGRESS TRACKER */
+.month-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 1rem; }
+.month-card {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 14px; padding: 1.1rem;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.month-card h4 {
+  font-family: 'Lora', serif; font-size: 0.95rem; font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.month-range { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.75rem; }
+.month-target {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.month-score-input {
+  font-family: 'JetBrains Mono', monospace;
+  width: 70px; border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 0.35rem 0.5rem;
+  font-size: 0.9rem; text-align: center;
+  background: var(--bg2); color: var(--orange); font-weight: 600;
+  outline: none;
+}
+.month-score-input:focus { border-color: var(--orange); }
+.month-bar {
+  height: 6px; background: var(--border2);
+  border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;
+}
+.month-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.month-badge { font-size: 0.68rem; color: var(--muted); }
+
+/* WEEKLY FORM */
+.weekly-form { display: flex; flex-direction: column; gap: 1.1rem; }
+.wf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.wf-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.wf-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--dim); font-weight: 700; }
+.wf-input {
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 0.5rem 0.75rem; font-size: 0.83rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg2); color: var(--text); outline: none;
+}
+.wf-input:focus { border-color: var(--orange); background: #fff; }
+.wf-score { 
+  display: grid; grid-template-columns: repeat(5,1fr); gap: 0.5rem;
+}
+.score-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+}
+.score-label { font-size: 0.62rem; color: var(--muted); text-align: center; }
+.score-val {
+  font-family: 'JetBrains Mono', monospace;
+  width: 48px; border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 0.35rem 0;
+  font-size: 0.85rem; text-align: center;
+  background: var(--bg2); color: var(--orange); font-weight: 600;
+  outline: none;
+}
+.score-val:focus { border-color: var(--orange); background: #fff; }
+
+/* RULES */
+.rules-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 0.75rem; }
+.rule-card {
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 12px; padding: 1rem;
+  box-shadow: 0 1px 6px var(--shadow);
+}
+.rule-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.rule-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 0.3rem; }
+.rule-desc { font-size: 0.76rem; color: var(--text2); line-height: 1.5; }
+
+/* TAGS */
+.tag {
+  display: inline-block; font-size: 0.68rem;
+  padding: 0.2rem 0.55rem; border-radius: 5px;
+  font-weight: 600; margin: 0.15rem;
+}
+.tag-amber { background: var(--orange-light); color: #92400E; border: 1px solid #FCD34D; }
+.tag-green { background: var(--green-light); color: #065F46; border: 1px solid #6EE7B7; }
+.tag-red { background: var(--red-light); color: #991B1B; border: 1px solid #FECACA; }
+.tag-blue { background: var(--blue-light); color: #1E40AF; border: 1px solid #BFDBFE; }
+.tag-purple { background: var(--purple-light); color: #5B21B6; border: 1px solid #DDD6FE; }
+
+/* UTILS */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.hr { border: none; border-top: 1.5px solid var(--border2); margin: 1.5rem 0; }
+.muted { color: var(--muted); }
+.orange { color: var(--orange); }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+small { font-size: 0.72rem; color: var(--muted); }
+
+/* STREAK TRACKER */
+.streak-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+}
+.streak-day {
+  aspect-ratio: 1; border-radius: 6px;
+  border: 1.5px solid var(--border); background: var(--bg2);
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--dim);
+}
+.streak-day:hover { border-color: var(--orange); }
+.streak-day.done-s { background: var(--green); border-color: var(--green); color: #fff; }
+.streak-day.skip { background: var(--red-light); border-color: #FECACA; color: var(--red); }
+.streak-day-label { font-size: 0.6rem; color: var(--dim); text-align: center; margin-bottom: 3px; }
+.streak-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 4px; }
+
+footer {
+  text-align: center; padding: 2rem 1rem;
+  color: var(--dim); font-size: 0.75rem;
+  border-top: 1.5px solid var(--border2);
+  background: var(--surface);
+}
+footer strong { color: var(--orange); }
+
+@media(max-width:580px) {
+  .power-grid { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .session-card { grid-template-columns: 70px 1fr; }
+  .t-session-body { grid-template-columns: 1fr; }
+  .wf-row { grid-template-columns: 1fr; }
+  .wf-score { grid-template-columns: repeat(3,1fr); }
+  .month-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">ADHD × GATE</div>
+    <button class="tab-btn active" onclick="show('overview',this)">🧠 Overview</button>
+    <button class="tab-btn" onclick="show('schedule',this)">⏱️ Schedule</button>
+    <button class="tab-btn" onclick="show('tracker',this)">📝 Daily Log</button>
+    <button class="tab-btn" onclick="show('weekly',this)">📅 Weekly</button>
+    <button class="tab-btn" onclick="show('progress',this)">📈 Progress</button>
+    <button class="tab-btn" onclick="show('emergency',this)">🆘 Emergency</button>
+    <button class="tab-btn" onclick="show('affirmations',this)">💬 Affirmations</button>
+    <button class="tab-btn" onclick="show('launch',this)">🚀 Launch</button>
+  </div>
+</nav>
+
+<!-- ========== OVERVIEW ========== -->
+<div id="overview" class="page active">
+  <div class="hero">
+    <div class="hero-badge">ADHD-Optimized · 32-Week Plan · 70+ Marks</div>
+    <h1 class="hero-title">Your ADHD Brain<br><em>is not broken.</em><br>It's different.</h1>
+    <p>This plan works <strong>with</strong> your ADHD — not against it. Structured hyperfocus, novelty rotation, gamification, and built-in rewards to get you to 70+ marks in GATE CSE.</p>
+    <div class="stat-row">
+      <div class="stat-pill"><span class="stat-num">5</span><span class="stat-label">Sessions/day<br>× 50 min each</span></div>
+      <div class="stat-pill"><span class="stat-num">32</span><span class="stat-label">Weeks<br>total plan</span></div>
+      <div class="stat-pill"><span class="stat-num">80%</span><span class="stat-label">Adherence<br>= success</span></div>
+      <div class="stat-pill"><span class="stat-num">70+</span><span class="stat-label">Target marks<br>top 5–8%</span></div>
+    </div>
+  </div>
+
+  <h2 class="sec"><span class="dot"></span>Your ADHD Superpowers (Leverage These!)</h2>
+  <div class="power-grid">
+    <div class="power-item good"><span class="power-icon">⚡</span><div class="power-text"><strong>Hyperfocus</strong>Deep dive into interesting problems — use this for hard topics</div></div>
+    <div class="power-item good"><span class="power-icon">🔀</span><div class="power-text"><strong>Novelty-Seeking</strong>Need variety — mix topics daily to stay engaged</div></div>
+    <div class="power-item good"><span class="power-icon">🎯</span><div class="power-text"><strong>Urgency Response</strong>Perform best under pressure — built-in deadlines work for you</div></div>
+    <div class="power-item good"><span class="power-icon">🔮</span><div class="power-text"><strong>Pattern Recognition</strong>Spot connections quickly across subjects</div></div>
+    <div class="power-item good"><span class="power-icon">🧩</span><div class="power-text"><strong>Creative Problem-Solving</strong>Think differently about tricky exam problems</div></div>
+    <div class="power-item good"><span class="power-icon">🔋</span><div class="power-text"><strong>High Burst Energy</strong>Sustain intense effort in short, focused sessions</div></div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--red)"></span>Your ADHD Challenges (Work Around These!)</h2>
+  <div class="power-grid">
+    <div class="power-item bad"><span class="power-icon">⏰</span><div class="power-text"><strong>Time Blindness</strong>Can't sense passage of time → Use timers religiously</div></div>
+    <div class="power-item bad"><span class="power-icon">🔀</span><div class="power-text"><strong>Executive Function</strong>Hard to start, switch, or organize → External structure</div></div>
+    <div class="power-item bad"><span class="power-icon">📱</span><div class="power-text"><strong>Distractibility</strong>Needs distraction-free environment → Phone in different room</div></div>
+    <div class="power-item bad"><span class="power-icon">🧠</span><div class="power-text"><strong>Working Memory</strong>Can't hold sequences → Write everything down</div></div>
+    <div class="power-item bad"><span class="power-icon">😤</span><div class="power-text"><strong>Task Initiation</strong>Procrastination on boring tasks → Gamify & rotate</div></div>
+    <div class="power-item bad"><span class="power-icon">😡</span><div class="power-text"><strong>Emotional Dysregulation</strong>Frustration with hard concepts → Break smaller</div></div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--blue)"></span>The Core Strategy</h2>
+  <div class="card card-amber">
+    <h3 class="card-head">Structured Hyperfocus + Novelty + Gamification</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+      <span class="tag tag-amber">⏱️ Timers always on</span>
+      <span class="tag tag-amber">🔄 Rotate topics every 50 min</span>
+      <span class="tag tag-green">🎮 Gamify daily review</span>
+      <span class="tag tag-green">🏆 Reward every session</span>
+      <span class="tag tag-blue">👥 External accountability</span>
+      <span class="tag tag-blue">📊 Visual progress tracking</span>
+      <span class="tag tag-purple">⚡ Use hyperfocus strategically</span>
+      <span class="tag tag-purple">🖊️ Multi-sensory learning</span>
+    </div>
+  </div>
+
+  <h2 class="sec"><span class="dot" style="background:var(--purple)"></span>Critical ADHD Rules</h2>
+  <div class="rules-grid">
+    <div class="rule-card"><div class="rule-icon">⏱️</div><div class="rule-title">Timer is Non-Negotiable</div><div class="rule-desc">Set phone timer for exactly 50 min. When it goes off — STOP. No negotiating. The break IS the reward.</div></div>
+    <div class="rule-card"><div class="rule-icon">🏃</div><div class="rule-title">Move Every 60 Min</div><div class="rule-desc">Not optional. Walk, stretch, dance, jump. Brain cannot focus without physical reset. 10 minutes minimum.</div></div>
+    <div class="rule-card"><div class="rule-icon">📵</div><div class="rule-title">Phone Away</div><div class="rule-desc">Different room during sessions. Timer app only exception. This is THE game-changer for ADHD focus.</div></div>
+    <div class="rule-card"><div class="rule-icon">🎯</div><div class="rule-title">One Resource at a Time</div><div class="rule-desc">Close all tabs except current resource. Tab-switching = ADHD death spiral. Commit to finishing one thing.</div></div>
+    <div class="rule-card"><div class="rule-icon">📊</div><div class="rule-title">Track Visually</div><div class="rule-desc">Check mark for each session. Tally correct answers. See progress accumulate. Your ADHD brain needs this.</div></div>
+    <div class="rule-card"><div class="rule-icon">🎉</div><div class="rule-title">Reward Immediately</div><div class="rule-desc">After each session: break is the reward. After each day: check off calendar. After each week: bigger reward.</div></div>
+  </div>
+</div>
+
+<!-- ========== SCHEDULE ========== -->
+<div id="schedule" class="page">
+  <h2 class="sec"><span class="dot"></span>Your 5-Hour Daily Schedule</h2>
+  <div class="card card-amber" style="margin-bottom:1.25rem">
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+      <div><span class="mono orange" style="font-size:1.1rem;font-weight:600">5 sessions × 50 min</span><br><small>= 250 min focused work + 40 min breaks = 5 hours total</small></div>
+      <div><span class="tag tag-green">Never study &gt;50 min straight</span></div>
+      <div><span class="tag tag-amber">Movement every break</span></div>
+      <div><span class="tag tag-blue">Vary activity each session</span></div>
+    </div>
+  </div>
+
+  <div class="session-grid">
+    <!-- Morning Ritual -->
+    <div class="card" style="padding:0.85rem 1.1rem;display:flex;align-items:center;gap:0.75rem;background:#FFF8EE;border-color:#FDE68A">
+      <span style="font-size:1.2rem">🌅</span>
+      <div><strong style="font-size:0.88rem">6:00–6:10 · Morning Ritual</strong><br><small>Water, movement, set intention for the day</small></div>
+      <span class="mono" style="margin-left:auto;font-size:0.75rem;color:var(--muted)">10 min</span>
+    </div>
+
+    <!-- Session 1 -->
+    <div class="session-card">
+      <div class="session-time" style="background:var(--orange)">
+        <div class="emoji">🧠</div>
+        <div class="label">Session 1</div>
+        <div style="font-size:0.6rem;opacity:0.85;margin-top:2px">6:10–7:00</div>
+      </div>
+      <div class="session-body">
+        <h4>Theory Topics · Hard Concepts</h4>
+        <p>Learn <em>one</em> concept deeply. Min 0–5: find an interesting angle. Min 5–40: deep dive. Min 40–50: draw or diagram it.</p>
+        <p style="margin-top:0.4rem;color:var(--muted)">Rotate: TOC → Compiler → Architecture → Networks</p>
+        <div class="session-hack">⏱️ Set timer · 📌 One resource only · ✍️ Must write or draw something</div>
+      </div>
+    </div>
+
+    <!-- Break -->
+    <div class="break-row">
+      <span class="break-time">7:00–7:10</span>
+      <span>✅ BREAK · Walk, stretch, water — 10 minutes</span>
+    </div>
+
+    <!-- Session 2 -->
+    <div class="session-card">
+      <div class="session-time" style="background:#2563EB">
+        <div class="emoji">✏️</div>
+        <div class="label">Session 2</div>
+        <div style="font-size:0.6rem;opacity:0.85;margin-top:2px">7:10–8:00</div>
+      </div>
+      <div class="session-body">
+        <h4>Practice Problems · Previous Year Qs</h4>
+        <p>Choose 5–6 questions on today's topic. Solve without looking at solutions (struggle = learning). Last 5 min: check answers + understand mistakes.</p>
+        <div class="session-hack">🎯 Block solutions · ⏱️ Time each question · 📊 Tally correct/wrong · 📵 Phone elsewhere</div>
+      </div>
+    </div>
+
+    <!-- Break -->
+    <div class="break-row">
+      <span class="break-time">8:00–8:10</span>
+      <span>✅ BREAK · Snack, stand, reset — 10 minutes</span>
+    </div>
+
+    <!-- Session 3 -->
+    <div class="session-card">
+      <div class="session-time" style="background:var(--purple)">
+        <div class="emoji">🔄</div>
+        <div class="label">Session 3</div>
+        <div style="font-size:0.6rem;opacity:0.85;margin-top:2px">8:10–9:00</div>
+      </div>
+      <div class="session-body">
+        <h4>Novelty Shift · Completely Different Topic</h4>
+        <p>Switch to a totally different subject. If Session 1 was abstract → Session 3 is applied. If it was math → now do engineering. Prevents ADHD boredom-crash.</p>
+        <p style="margin-top:0.4rem;color:var(--muted)">Example: DB Normalization (boring theory) → IP Subnetting (calculable, practical)</p>
+        <div class="session-hack">🎨 Different location if possible · 🔄 Different resource format · 🎵 Change background sound</div>
+      </div>
+    </div>
+
+    <!-- Break -->
+    <div class="break-row">
+      <span class="break-time">9:00–9:10</span>
+      <span>✅ BREAK · Stretch, fresh air, water — 10 minutes</span>
+    </div>
+
+    <!-- Session 4 -->
+    <div class="session-card">
+      <div class="session-time" style="background:#059669">
+        <div class="emoji">📝</div>
+        <div class="label">Session 4</div>
+        <div style="font-size:0.6rem;opacity:0.85;margin-top:2px">9:10–10:00</div>
+      </div>
+      <div class="session-body">
+        <h4>Active Learning · Write or Explain It</h4>
+        <p>Teach yourself the concept out loud or on paper. Choose one method:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem">
+          <span class="tag tag-green">🗣️ Teach mode (record yourself)</span>
+          <span class="tag tag-blue">✍️ Write a blog-style explanation</span>
+          <span class="tag tag-purple">🗺️ Create a concept map</span>
+          <span class="tag tag-amber">❓ Generate 10 test questions</span>
+        </div>
+        <div class="session-hack">🗣️ Speaking uses different brain circuits — ADHD benefit! Great for Normalization, TOC, Compilers</div>
+      </div>
+    </div>
+
+    <!-- Break -->
+    <div class="break-row">
+      <span class="break-time">10:00–10:10</span>
+      <span>✅ BREAK · Fresh air if possible — 10 minutes</span>
+    </div>
+
+    <!-- Session 5 -->
+    <div class="session-card">
+      <div class="session-time" style="background:#DC2626">
+        <div class="emoji">🎮</div>
+        <div class="label">Session 5</div>
+        <div style="font-size:0.6rem;opacity:0.85;margin-top:2px">10:10–11:00</div>
+      </div>
+      <div class="session-body">
+        <h4>Gamified Review · Fun Mode</h4>
+        <p>Review + test yourself. Rotate methods daily:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem">
+          <span class="tag tag-amber">🃏 Flashcard Blitz (Quizlet)</span>
+          <span class="tag tag-blue">🏆 Kahoot competitive quiz</span>
+          <span class="tag tag-green">⚡ Speed Run (10+10 quick Qs)</span>
+          <span class="tag tag-purple">❌ Mistake Review (re-solve wrongs)</span>
+        </div>
+        <div class="session-hack">🎮 Gamification = dopamine · ⏱️ Speed creates urgency · 🏆 Keep score/streak · Target: 70%+</div>
+      </div>
+    </div>
+
+    <!-- End -->
+    <div class="card" style="padding:0.85rem 1.1rem;display:flex;align-items:center;gap:0.75rem;background:#F0FDF4;border-color:#BBF7D0">
+      <span style="font-size:1.2rem">🎉</span>
+      <div><strong style="font-size:0.88rem">11:00–11:15 · Checkpoint & Celebration</strong><br><small>Review the day · Reward yourself · Check off calendar · Plan tomorrow</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DAILY TRACKER ========== -->
+<div id="tracker" class="page">
+  <h2 class="sec"><span class="dot"></span>Daily Session Log</h2>
+  <div class="card" style="margin-bottom:1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+    <div class="wf-field" style="flex:1;min-width:140px">
+      <label class="wf-label">Date</label>
+      <input class="wf-input" type="date" id="log-date">
+    </div>
+    <div class="wf-field" style="flex:1;min-width:140px">
+      <label class="wf-label">Day of Week</label>
+      <input class="wf-input" id="log-day" placeholder="e.g. Monday" type="text">
+    </div>
+    <div class="wf-field" style="flex:1;min-width:140px">
+      <label class="wf-label">Morning Energy</label>
+      <div class="radio-row" id="energy-pick">
+        <span class="radio-opt" onclick="pick(this,'energy-pick','sel-g')">🔋 HIGH</span>
+        <span class="radio-opt" onclick="pick(this,'energy-pick','sel')">⚡ MED</span>
+        <span class="radio-opt" onclick="pick(this,'energy-pick','')">😴 LOW</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tracker-sessions" id="tracker-sessions">
+    <!-- Built by JS -->
+  </div>
+
+  <div class="summary-box" id="daily-summary">
+    <h3 class="card-head">📊 Daily Summary</h3>
+    <div class="summary-grid">
+      <div class="summary-stat"><div class="summary-num" id="done-count">0/5</div><div class="summary-sub">Sessions Done</div></div>
+      <div class="summary-stat"><div class="summary-num" id="avg-score">—%</div><div class="summary-sub">Quiz Average</div></div>
+      <div class="summary-stat"><div class="summary-num" id="focus-score">—</div><div class="summary-sub">Best Focus</div></div>
+    </div>
+    <div style="margin-top:0.75rem;display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+      <div class="wf-field"><label class="wf-label">Biggest Challenge</label><input class="wf-input" placeholder="What was hard?"></div>
+      <div class="wf-field"><label class="wf-label">What Helped Most</label><input class="wf-input" placeholder="What worked well?"></div>
+      <div class="wf-field"><label class="wf-label">What Killed Focus</label><input class="wf-input" placeholder="Distraction?"></div>
+      <div class="wf-field"><label class="wf-label">Tomorrow's Key Topic</label><input class="wf-input" placeholder="Plan ahead"></div>
+    </div>
+    <div style="margin-top:1rem">
+      <h3 class="card-head">🎁 Rewards Earned</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem" id="rewards-section">
+        <span class="tag tag-amber" style="cursor:pointer;padding:0.3rem 0.75rem" onclick="this.style.background='#D1FAE5';this.style.color='#065F46';this.style.borderColor='#6EE7B7'">☐ All 5 sessions = Daily celebration</span>
+        <span class="tag tag-amber" style="cursor:pointer;padding:0.3rem 0.75rem" onclick="this.style.background='#D1FAE5';this.style.color='#065F46';this.style.borderColor='#6EE7B7'">☐ 70%+ quiz = Extra-long next break</span>
+        <span class="tag tag-amber" style="cursor:pointer;padding:0.3rem 0.75rem" onclick="this.style.background='#D1FAE5';this.style.color='#065F46';this.style.borderColor='#6EE7B7'">☐ Smile & check off calendar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== WEEKLY ========== -->
+<div id="weekly" class="page">
+  <h2 class="sec"><span class="dot"></span>Weekly Checkpoint</h2>
+  <div class="card card-amber" style="margin-bottom:1.25rem">
+    <small>Fill this out every Sunday evening · Takes 30–45 minutes · Non-negotiable part of the system</small>
+  </div>
+
+  <div class="weekly-form">
+    <!-- Sessions -->
+    <div class="card">
+      <h3 class="card-head">📊 Session Completion</h3>
+      <div style="margin-bottom:0.75rem">
+        <div class="streak-labels">
+          <div class="streak-day-label">Mon</div><div class="streak-day-label">Tue</div>
+          <div class="streak-day-label">Wed</div><div class="streak-day-label">Thu</div>
+          <div class="streak-day-label">Fri</div><div class="streak-day-label">Sat</div>
+          <div class="streak-day-label">Sun</div>
+        </div>
+        <div class="streak-grid" id="week-sessions"><!-- built by JS --></div>
+        <div style="margin-top:0.65rem;font-size:0.75rem;color:var(--muted)">Click each cell: once = ✓ done, twice = ✗ skipped, three = clear</div>
+      </div>
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+        <div><span class="mono orange" id="w-sessions-count" style="font-size:1.1rem;font-weight:600">0/35</span><span style="font-size:0.72rem;color:var(--muted);margin-left:0.4rem">sessions this week</span></div>
+        <span class="tag" id="w-track-badge" style="background:var(--border2);color:var(--muted)">Target: 28+/35</span>
+      </div>
+    </div>
+
+    <!-- Quiz scores -->
+    <div class="card">
+      <h3 class="card-head">✅ Daily Quiz Scores (Session 5)</h3>
+      <div class="wf-score">
+        <div class="score-cell"><div class="score-label">Mon</div><input class="score-val" id="qs-0" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Tue</div><input class="score-val" id="qs-1" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Wed</div><input class="score-val" id="qs-2" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Thu</div><input class="score-val" id="qs-3" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Fri</div><input class="score-val" id="qs-4" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Sat</div><input class="score-val" id="qs-5" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+        <div class="score-cell"><div class="score-label">Sun</div><input class="score-val" id="qs-6" type="number" min="0" max="100" placeholder="%" oninput="calcQuizAvg()"></div>
+      </div>
+      <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.75rem">
+        <span style="font-size:0.78rem;color:var(--muted)">Week Average:</span>
+        <span class="mono orange" id="quiz-avg-display" style="font-size:1.1rem;font-weight:600">—%</span>
+        <span class="tag tag-green" id="quiz-badge" style="display:none">✅ On Target!</span>
+        <span class="tag tag-red" id="quiz-warn" style="display:none">⚠️ Below 70%</span>
+      </div>
+    </div>
+
+    <!-- Energy tracking -->
+    <div class="card">
+      <h3 class="card-head">🧠 Energy & Focus</h3>
+      <div class="wf-row">
+        <div class="wf-field"><label class="wf-label">Days Deeply Focused</label><input class="wf-input" type="number" min="0" max="7" placeholder="of 7"></div>
+        <div class="wf-field"><label class="wf-label">Days Scattered</label><input class="wf-input" type="number" min="0" max="7" placeholder="of 7"></div>
+        <div class="wf-field"><label class="wf-label">Best Time of Day</label><input class="wf-input" placeholder="e.g. Early morning"></div>
+        <div class="wf-field"><label class="wf-label">Biggest Distraction</label><input class="wf-input" placeholder="e.g. Phone, noise..."></div>
+        <div class="wf-field"><label class="wf-label">What Helped Most</label><input class="wf-input" placeholder="Write here..."></div>
+        <div class="wf-field"><label class="wf-label">Fix for Next Week</label><input class="wf-input" placeholder="One change..."></div>
+      </div>
+    </div>
+
+    <!-- Wins & Fixes -->
+    <div class="two-col">
+      <div class="card card-green">
+        <h3 class="card-head">💪 What Went Well</h3>
+        <div class="wf-field" style="margin-bottom:0.5rem"><input class="wf-input" placeholder="Win #1..."></div>
+        <div class="wf-field" style="margin-bottom:0.5rem"><input class="wf-input" placeholder="Win #2..."></div>
+        <div class="wf-field"><input class="wf-input" placeholder="Win #3..."></div>
+      </div>
+      <div class="card card-red">
+        <h3 class="card-head">🔧 What Needs Fixing</h3>
+        <div class="wf-field" style="margin-bottom:0.5rem"><input class="wf-input" placeholder="Problem #1..."></div>
+        <div class="wf-field" style="margin-bottom:0.5rem"><input class="wf-input" placeholder="Fix for it..."></div>
+        <div class="wf-field"><input class="wf-input" placeholder="Problem #2..."></div>
+      </div>
+    </div>
+
+    <!-- Weekly score -->
+    <div class="card" style="background:linear-gradient(135deg,#FFF8EE,#F0FDF4)">
+      <h3 class="card-head">📈 Weekly Score (Rate 1–10 each)</h3>
+      <div class="wf-score">
+        <div class="score-cell"><div class="score-label">Session Completion</div><input class="score-val" type="number" min="1" max="10" placeholder="/10" oninput="calcWeekScore()"></div>
+        <div class="score-cell"><div class="score-label">Quiz Performance</div><input class="score-val" type="number" min="1" max="10" placeholder="/10" oninput="calcWeekScore()"></div>
+        <div class="score-cell"><div class="score-label">Energy Level</div><input class="score-val" type="number" min="1" max="10" placeholder="/10" oninput="calcWeekScore()"></div>
+        <div class="score-cell"><div class="score-label">Focus Quality</div><input class="score-val" type="number" min="1" max="10" placeholder="/10" oninput="calcWeekScore()"></div>
+        <div class="score-cell"><div class="score-label">Motivation</div><input class="score-val" type="number" min="1" max="10" placeholder="/10" oninput="calcWeekScore()"></div>
+      </div>
+      <div style="margin-top:0.85rem;display:flex;align-items:center;gap:0.75rem">
+        <span class="mono orange" id="week-total" style="font-size:1.2rem;font-weight:600">— /50</span>
+        <span style="font-size:0.78rem;color:var(--muted)">≥ 32/50 = successful week!</span>
+        <span class="tag tag-green" id="week-ok" style="display:none">✅ Success!</span>
+      </div>
+    </div>
+
+    <!-- Next week -->
+    <div class="card card-blue">
+      <h3 class="card-head">🎯 Next Week's Intentions</h3>
+      <div class="wf-row">
+        <div class="wf-field"><label class="wf-label">One Thing to KEEP</label><input class="wf-input" placeholder="Keep doing..."></div>
+        <div class="wf-field"><label class="wf-label">One Thing to CHANGE</label><input class="wf-input" placeholder="Change this..."></div>
+        <div class="wf-field"><label class="wf-label">One Thing to ADD</label><input class="wf-input" placeholder="Add this..."></div>
+        <div class="wf-field"><label class="wf-label">Focus Topic Next Week</label><input class="wf-input" placeholder="This week I'll focus on..."></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PROGRESS ========== -->
+<div id="progress" class="page">
+  <h2 class="sec"><span class="dot"></span>Monthly Progress Tracker</h2>
+  <div class="card" style="margin-bottom:1.25rem;background:var(--orange-light);border-color:#FCD34D">
+    <small style="color:#92400E">Enter your mock test score for each month checkpoint. Visual proof of progress = dopamine boost your ADHD brain needs!</small>
+  </div>
+
+  <div class="month-grid">
+    <div class="month-card">
+      <h4>Month 1 · Foundation</h4>
+      <div class="month-range">Weeks 1–4 · Build the routine</div>
+      <div class="month-target">
+        <div><small>Target:</small><br><span class="mono" style="color:var(--orange);font-weight:600">40–50 marks</span></div>
+        <div><small>Your score:</small><br><input class="month-score-input" type="number" placeholder="—" oninput="updateMonthBar(this,0,50)"></div>
+      </div>
+      <div class="month-bar"><div class="month-bar-fill" id="mb-0" style="width:0%;background:var(--orange)"></div></div>
+      <div class="month-badge">Goal: 70–80% sessions · 65%+ quiz avg</div>
+    </div>
+    <div class="month-card">
+      <h4>Month 2 · Momentum</h4>
+      <div class="month-range">Weeks 5–8 · Go deeper</div>
+      <div class="month-target">
+        <div><small>Target:</small><br><span class="mono" style="color:var(--orange);font-weight:600">50–60 marks</span></div>
+        <div><small>Your score:</small><br><input class="month-score-input" type="number" placeholder="—" oninput="updateMonthBar(this,1,60)"></div>
+      </div>
+      <div class="month-bar"><div class="month-bar-fill" id="mb-1" style="width:0%;background:var(--orange)"></div></div>
+      <div class="month-badge">Take first mock test · 80%+ sessions</div>
+    </div>
+    <div class="month-card">
+      <h4>Month 3 · Mastery</h4>
+      <div class="month-range">Weeks 9–12 · Deep understanding</div>
+      <div class="month-target">
+        <div><small>Target:</small><br><span class="mono" style="color:var(--green);font-weight:600">60–65 marks</span></div>
+        <div><small>Your score:</small><br><input class="month-score-input" type="number" placeholder="—" oninput="updateMonthBar(this,2,65)"></div>
+      </div>
+      <div class="month-bar"><div class="month-bar-fill" id="mb-2" style="width:0%;background:var(--green)"></div></div>
+      <div class="month-badge">Heavy Session 4 · 72%+ quiz avg</div>
+    </div>
+    <div class="month-card">
+      <h4>Month 4 · Final Push</h4>
+      <div class="month-range">Weeks 13–16 · Exam ready</div>
+      <div class="month-target">
+        <div><small>Target:</small><br><span class="mono" style="color:var(--green);font-weight:600">65–70 marks</span></div>
+        <div><small>Your score:</small><br><input class="month-score-input" type="number" placeholder="—" oninput="updateMonthBar(this,3,70)"></div>
+      </div>
+      <div class="month-bar"><div class="month-bar-fill" id="mb-3" style="width:0%;background:var(--green)"></div></div>
+      <div class="month-badge">Full mock tests · 75%+ quiz avg</div>
+    </div>
+    <div class="month-card" style="border-color:#DDD6FE">
+      <h4>Month 5–8 · Advanced</h4>
+      <div class="month-range">Weeks 17–32 · The final stretch</div>
+      <div class="month-target">
+        <div><small>Target:</small><br><span class="mono" style="color:var(--purple);font-weight:600">70–80 marks 🎯</span></div>
+        <div><small>Your score:</small><br><input class="month-score-input" type="number" placeholder="—" oninput="updateMonthBar(this,4,80)" style="color:var(--purple)"></div>
+      </div>
+      <div class="month-bar"><div class="month-bar-fill" id="mb-4" style="width:0%;background:var(--purple)"></div></div>
+      <div class="month-badge">🎉 If you hit 70+ here — you're ready!</div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--green)"></span>Monthly Streak Tracker</h2>
+  <div class="card">
+    <h3 class="card-head">Click a day: ✓ done · ✗ skipped · clear</h3>
+    <div class="streak-labels" style="grid-template-columns:repeat(7,1fr)">
+      <div class="streak-day-label">M</div><div class="streak-day-label">T</div>
+      <div class="streak-day-label">W</div><div class="streak-day-label">T</div>
+      <div class="streak-day-label">F</div><div class="streak-day-label">S</div>
+      <div class="streak-day-label">S</div>
+    </div>
+    <div class="streak-grid" id="month-streak"></div>
+    <div style="margin-top:0.75rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+      <span class="mono orange" id="streak-done" style="font-size:1rem;font-weight:600">0 done</span>
+      <span class="tag tag-green" id="streak-pct">0%</span>
+      <span style="font-size:0.75rem;color:var(--muted)">Goal: 80%+ = 23+ days</span>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--blue)"></span>Milestone Achievements</h2>
+  <div style="display:flex;flex-direction:column;gap:0.4rem">
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Completed 1 full week of 5-hour study days</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Hit 70%+ quiz score for the first time</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Finished first major subject area completely</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Completed 500+ practice problems total</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Took and scored 50+ on first mock test</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Built a 30-day study streak</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Scored 65+ on a full mock exam</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Hit the target: 70+ marks! 🎉</span></label>
+  </div>
+</div>
+
+<!-- ========== EMERGENCY ========== -->
+<div id="emergency" class="page">
+  <div class="card" style="background:#FFF7ED;border:2px solid #FED7AA;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:flex-start;gap:0.75rem">
+      <span style="font-size:1.5rem">💭</span>
+      <div>
+        <div style="font-family:'Lora',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.35rem">You feel like quitting. That's normal.</div>
+        <div style="font-size:0.84rem;color:var(--text2);line-height:1.6">Your ADHD brain is not lying to you maliciously — it's just reacting. Use this decision tree to find out what's <em>actually</em> going on, and what to do about it.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec"><span class="dot" style="background:var(--red)"></span>Step 1: What's Actually Happening?</h2>
+  <div class="dtree">
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">😴</span><span>I'm bored</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>Your brain needs novelty — this is <strong>expected with ADHD</strong>, not a failure.</p>
+        <div class="dtree-sol">✅ Rotate topics more (shorter sessions?) · Try a new study location · Change your resource format<br><strong>NOT time to quit — time to adjust novelty level.</strong></div>
+      </div>
+    </div>
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">😰</span><span>I'm scared of failing</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>Your brain interprets difficulty as danger — this is a classic <strong>ADHD pattern</strong>.</p>
+        <div class="dtree-sol">✅ Break into smaller chunks · Celebrate very small wins · Reduce difficulty temporarily<br><strong>NOT time to quit — time to slow down.</strong></div>
+      </div>
+    </div>
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">🧩</span><span>One topic is too hard</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>This is actually <strong>where learning happens</strong>. Struggle is not failure — it's the process.</p>
+        <div class="dtree-sol">✅ Use Session 4 (teach yourself out loud) · Break topic into sub-topics · Ask for help<br><strong>NOT time to quit — time to ask for help.</strong></div>
+      </div>
+    </div>
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">🔥</span><span>The schedule is too intense</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>You picked too ambitious a pace — that's okay! The schedule exists to serve you.</p>
+        <div class="dtree-sol">✅ Reduce to 3–4 hours for a few weeks · Shorten session lengths to 30 min · Make studying feel easy again, then ramp up<br><strong>NOT time to quit — time to be realistic.</strong></div>
+      </div>
+    </div>
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">📉</span><span>I'm not seeing progress</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>You're probably not <strong>measuring properly</strong>. Progress is real but invisible without graphs.</p>
+        <div class="dtree-sol">✅ Take a mock test RIGHT NOW to see real progress · Graph your quiz scores · Look at the topics you've covered<br><strong>NOT time to quit — time to measure better.</strong></div>
+      </div>
+    </div>
+    <div class="dtree-node">
+      <div class="dtree-trigger" onclick="toggleTree(this)">
+        <span class="dtree-icon">💀</span><span>I just want to give up</span><span class="dtree-arrow">›</span>
+      </div>
+      <div class="dtree-body">
+        <p>Welcome to the <strong>ADHD motivation crash</strong>. This is completely normal. This is the wall everyone hits.</p>
+        <div class="dtree-sol">✅ Call your accountability partner RIGHT NOW · Take 1 full day off (not quitting — resting) · Do something you love · Come back tomorrow with Step 2 below</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--purple)"></span>Step 2: Emergency Motivation Protocol</h2>
+  <div style="display:flex;flex-direction:column;gap:0.5rem">
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">📞 <strong>Call accountability partner.</strong> Message: "I feel like quitting. Talk me through this?" Don't let them agree — get their perspective.</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">🌅 <strong>Take a BREAK (not quit).</strong> 1 full day off. Do something you love. Come back refreshed — not guilty.</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">🎁 <strong>Give yourself a massive reward.</strong> You've come this far! Do something really nice for yourself. Remind yourself why you started.</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">📉 <strong>Reduce load temporarily.</strong> Drop to 3 hours for 1 week. Make studying feel easy. Then ramp back up.</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">🔀 <strong>Change something.</strong> Different study location, different time, different topic order. Novelty resets ADHD motivation.</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">🏆 <strong>Remember your wins.</strong> Look at your streak counter. Look at score improvement. Look at topics mastered. You've done the hard part.</span></label>
+  </div>
+
+  <div class="hr"></div>
+  <div class="card" style="background:linear-gradient(135deg,#FFF8EE,#F0FDF4);border-color:#FCD34D">
+    <div style="font-family:'Lora',serif;font-size:1rem;font-weight:700;margin-bottom:0.75rem">Step 3: The Truth Talk</div>
+    <div style="font-size:0.85rem;color:var(--text2);line-height:1.75">
+      You've already invested weeks of your life into this. <strong>Quitting now</strong> means all that work was for nothing — you start over from zero, with guilt.<br><br>
+      <strong>Continuing for just 1 more week</strong> means you prove you can push through. You've proven you're committed. You get the thing you want.<br><br>
+      <em style="color:var(--orange)">Your ADHD brain is lying to you right now. It's not that you can't do this. It's that your brain needs a DIFFERENT thing right now.</em><br><br>
+      <strong>So don't quit. Adjust. Breathe. Ask for help. Then keep going.</strong><br>
+      Because 70 marks on GATE = life-changing. And you're already so close. 💪
+    </div>
+  </div>
+</div>
+
+<!-- ========== AFFIRMATIONS ========== -->
+<div id="affirmations" class="page">
+  <h2 class="sec"><span class="dot"></span>ADHD Affirmations for Tough Days</h2>
+  <div class="card card-amber" style="margin-bottom:1.25rem">
+    <small>Print these and keep them visible on your study desk. When you want to quit, read these. Then do Session 5 (gamified review). Then celebrate. Then come back tomorrow.</small>
+  </div>
+  <div class="aff-grid">
+    <div class="aff-card" data-emoji="🧠">
+      <blockquote>My ADHD brain isn't broken. It's just <span class="aff-em">different.</span> This plan works <span class="aff-em">with</span> me, not against me.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="⏱️">
+      <blockquote>I can do <span class="aff-em">50 minutes.</span> I've done it before. I can do it again right now.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="⚡">
+      <blockquote>Hyperfocus is my <span class="aff-em">superpower.</span> I'll use it strategically. Other people wish they could focus like I do.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="🎯">
+      <blockquote>I don't need to be perfect. <span class="aff-em">70% progress</span> is progress. Better than yesterday is enough.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="🔔">
+      <blockquote>Timers <span class="aff-em">help</span> me. They don't restrict me. They free me to focus without watching the clock.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="🌈">
+      <blockquote>Novelty keeps me engaged. <span class="aff-em">Variety</span> is my friend. Boredom is not inevitable — it's a signal to rotate.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="🔄">
+      <blockquote>When I struggle, I <span class="aff-em">adjust.</span> I don't quit. Adjustment is the strategy, not failure.</blockquote>
+    </div>
+    <div class="aff-card" data-emoji="🏆">
+      <blockquote><span class="aff-em">70 marks</span> is achievable. I'm going to get there. My ADHD brain can absolutely do this.</blockquote>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+  <h2 class="sec"><span class="dot" style="background:var(--purple)"></span>Topic Engagement Guide</h2>
+  <div class="two-col">
+    <div class="card card-green">
+      <h3 class="card-head">✅ Naturally Engaging (Use for Hyperfocus)</h3>
+      <div style="display:flex;flex-direction:column;gap:0.4rem">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--green-light)"><span>🧩</span><span style="font-size:0.82rem"><strong>Algorithms</strong> — problem-solving is inherently satisfying</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--green-light)"><span>📊</span><span style="font-size:0.82rem"><strong>Data Structures</strong> — visual, concrete, hands-on</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--green-light)"><span>🌐</span><span style="font-size:0.82rem"><strong>Networks</strong> — relatable real-world concepts</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--green-light)"><span>💻</span><span style="font-size:0.82rem"><strong>Programming</strong> — see immediate results</span></div>
+      </div>
+    </div>
+    <div class="card card-amber">
+      <h3 class="card-head">🎮 Needs Gamification (Session 5 focus)</h3>
+      <div style="display:flex;flex-direction:column;gap:0.4rem">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--orange-light)"><span>🗃️</span><span style="font-size:0.82rem"><strong>DB Normalization</strong> — seems boring but is pattern-based</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--orange-light)"><span>🤖</span><span style="font-size:0.82rem"><strong>Theory of Computation</strong> — abstract & proof-heavy</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--orange-light)"><span>⚡</span><span style="font-size:0.82rem"><strong>Digital Logic</strong> — feels like rote memorization</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem;border-radius:6px;background:var(--orange-light)"><span>📐</span><span style="font-size:0.82rem"><strong>Engineering Math</strong> — can feel disconnected</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LAUNCH ========== -->
+<div id="launch" class="page">
+  <div class="hero" style="margin-bottom:2rem">
+    <div class="hero-badge">Pre-Launch Checklist</div>
+    <h1 class="hero-title">Ready to <em>Launch?</em></h1>
+    <p>Complete every section below before starting Week 1. Don't skip this — setup is 30% of success with ADHD.</p>
+  </div>
+
+  <div class="checklist-group">
+    <div class="cg-title">🖥️ Physical Setup</div>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Study location chosen and set up</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Phone-away method planned (different room / drawer / with someone)</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Timer set up (phone app + smart speaker ideally)</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Calendar printed or created for daily check marks</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Notebooks, pens, pencils ready at desk</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Headphones working for video sessions</span></label>
+  </div>
+
+  <div class="checklist-group">
+    <div class="cg-title">💻 Digital Setup</div>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Quizlet account created for flashcard sessions</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Notion / Excel tracking spreadsheet set up</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">YouTube playlists organized by subject</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">PDF reader set up with textbook materials</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Discord / group chat for accountability partner</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Google Calendar alarms set (6:10, 7:00, 7:10... every session)</span></label>
+  </div>
+
+  <div class="checklist-group">
+    <div class="cg-title">🧠 Mental Setup</div>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Identified my hyperfocus topics (the ones I can dive into for hours)</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Identified my boring topics (need more gamification)</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Know my best time of day for deep work</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Know my biggest distraction and have a plan to eliminate it</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Found an accountability partner (friend / mentor / study group)</span></label>
+  </div>
+
+  <div class="checklist-group">
+    <div class="cg-title">🎯 Mindset</div>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Accepted that ADHD works differently — and that's okay</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Know that 70% completion = goal (not 100% perfection)</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Know that 80% schedule adherence = success</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Committed to adjusting — not quitting — when things get hard</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Ready to celebrate small wins along the way</span></label>
+    <label class="check-item" onclick="toggle(this)"><div class="check-box"></div><span class="check-text">Told someone about my plan and start date</span></label>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#FFF8EE,#F0FDF4);border-color:#FCD34D;margin-top:0.5rem">
+    <h3 class="card-head">🚀 Launch Details</h3>
+    <div class="wf-row">
+      <div class="wf-field"><label class="wf-label">Start Date</label><input class="wf-input" type="date"></div>
+      <div class="wf-field"><label class="wf-label">First Session Time</label><input class="wf-input" type="time"></div>
+      <div class="wf-field"><label class="wf-label">Accountability Partner</label><input class="wf-input" placeholder="Name / contact..."></div>
+      <div class="wf-field"><label class="wf-label">First Topic (Week 1)</label><input class="wf-input" placeholder="e.g. Discrete Math..."></div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:var(--surface);border-radius:10px;border:1.5px solid var(--border2);text-align:center">
+      <div style="font-family:'Lora',serif;font-size:1.1rem;font-weight:700;color:var(--orange)">Let's go crush this. You've got this. 🧠💪🎯</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem">Tomorrow morning, set your timer. Start Session 1. Check off the calendar. Celebrate.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  ADHD × GATE CSE Prep System · Built for your brain, not against it · <strong>70+ marks is achievable. You've got this.</strong> 🎯
+</footer>
+
+<!-- Floating Save Button -->
+<button class="t-done-btn" style="background: #4caf50; color: white; position: fixed; bottom: 30px; right: 30px; z-index: 1000; box-shadow: 0 6px 12px rgba(0,0,0,0.2); padding: 15px 25px; border-radius: 50px; border: none; cursor: pointer; font-size: 16px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onclick="saveDashboardData()">
+  💾 Save Dashboard
+</button>
+
+<script>
+// Tab switching
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// Checklist toggle
+function toggle(el) { el.classList.toggle('done'); }
+
+// Decision tree
+function toggleTree(trigger) {
+  const node = trigger.closest('.dtree-node');
+  node.classList.toggle('open');
+}
+
+// Radio picker
+function pick(el, groupId, cls) {
+  document.getElementById(groupId).querySelectorAll('.radio-opt').forEach(o => {
+    o.classList.remove('sel','sel-g');
+  });
+  if(cls) el.classList.add(cls);
+}
+
+// Build tracker sessions
+const sessions = [
+  { n:1, title:'Theory Topics', time:'6:10–7:00', fields:['Topic','Resource Used'], hasScore:false, hasFocus:true },
+  { n:2, title:'Practice Problems', time:'7:10–8:00', fields:['Topic'], hasScore:true, hasFocus:false },
+  { n:3, title:'Different Topic', time:'8:10–9:00', fields:['Topic','Resource Used'], hasScore:false, hasFocus:true },
+  { n:4, title:'Active Learning', time:'9:10–10:00', fields:['Topic Covered'], hasScore:false, hasFocus:true },
+  { n:5, title:'Gamified Review', time:'10:10–11:00', fields:['Topics Reviewed'], hasScore:true, hasFocus:false },
+];
+let doneSessions = [false,false,false,false,false];
+
+function buildTracker() {
+  const cont = document.getElementById('tracker-sessions');
+  cont.innerHTML = sessions.map((s,i) => `
+    <div class="t-session" id="ts-${i}">
+      <div class="t-session-header">
+        <div class="t-session-num">${s.n}</div>
+        <div class="t-session-title">${s.title}</div>
+        <div class="t-session-time">${s.time}</div>
+        <button class="t-done-btn" id="tdb-${i}" onclick="markDone(${i})">✓ Done</button>
+      </div>
+      <div class="t-session-body">
+        ${s.fields.map(f => `
+          <div class="t-field">
+            <div class="t-label">${f}</div>
+            <input class="t-input" placeholder="Enter ${f.toLowerCase()}...">
+          </div>
+        `).join('')}
+        ${s.hasScore ? `
+          <div class="t-field">
+            <div class="t-label">Score (%)</div>
+            <input class="t-input" type="number" min="0" max="100" placeholder="%" id="score-s${i}" oninput="updateSummary()">
+          </div>
+          <div class="t-field">
+            <div class="t-label">Qs Correct / Total</div>
+            <input class="t-input" placeholder="e.g. 4/6">
+          </div>
+        ` : ''}
+        ${s.hasFocus ? `
+          <div class="t-field">
+            <div class="t-label">Focus Level</div>
+            <div class="radio-row" id="focus-s${i}">
+              <span class="radio-opt" onclick="pick(this,'focus-s${i}','sel-g')">🎯 DEEP</span>
+              <span class="radio-opt" onclick="pick(this,'focus-s${i}','sel')">😐 OK</span>
+              <span class="radio-opt" onclick="pick(this,'focus-s${i}','')">🌀 SCATTERED</span>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function markDone(i) {
+  doneSessions[i] = !doneSessions[i];
+  const btn = document.getElementById(`tdb-${i}`);
+  btn.classList.toggle('done', doneSessions[i]);
+  btn.textContent = doneSessions[i] ? '✅ Done!' : '✓ Done';
+  updateSummary();
+}
+
+function updateSummary() {
+  const cnt = doneSessions.filter(Boolean).length;
+  document.getElementById('done-count').textContent = `${cnt}/5`;
+  // quiz avg from sessions 2 and 5
+  const scores = [1,4].map(i => {
+    const el = document.getElementById(`score-s${i}`);
+    return el && el.value ? parseFloat(el.value) : null;
+  }).filter(v => v !== null);
+  if (scores.length) {
+    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    document.getElementById('avg-score').textContent = `${avg}%`;
+  }
+}
+
+// Build weekly session grid
+function buildWeekGrid() {
+  const cont = document.getElementById('week-sessions');
+  let state = []; // 0=empty 1=done 2=skip
+  for(let d=0; d<7; d++){
+    state[d] = [];
+    for(let s=0; s<5; s++) state[d][s] = 0;
+  }
+  let html = '';
+  for(let d=0; d<7; d++) {
+    for(let s=0; s<5; s++) {
+      html += `<div class="streak-day" id="ws-${d}-${s}" onclick="cycleWS(${d},${s})">${s+1}</div>`;
+    }
+  }
+  // Add empty slots to complete 7 cols
+  html += `<div style="display:none"></div><div style="display:none"></div>`;
+  cont.innerHTML = html;
+}
+
+const wsState = {};
+function cycleWS(d,s) {
+  const key = `${d}-${s}`;
+  wsState[key] = ((wsState[key]||0) + 1) % 3;
+  const el = document.getElementById(`ws-${d}-${s}`);
+  el.classList.remove('done-s','skip');
+  if (wsState[key]===1) { el.classList.add('done-s'); el.textContent='✓'; }
+  else if (wsState[key]===2) { el.classList.add('skip'); el.textContent='✗'; }
+  else { el.textContent = s+1; }
+  updateWeekCount();
+}
+
+function updateWeekCount() {
+  let done = Object.values(wsState).filter(v=>v===1).length;
+  document.getElementById('w-sessions-count').textContent = `${done}/35`;
+  const badge = document.getElementById('w-track-badge');
+  if (done >= 28) { badge.className='tag tag-green'; badge.textContent='✅ On Track!'; }
+  else if (done >= 21) { badge.className='tag tag-amber'; badge.textContent='⚠️ Slight Miss'; }
+  else { badge.className='tag tag-red'; badge.textContent='❌ Need Catch-Up'; }
+}
+
+function calcQuizAvg() {
+  const vals = [0,1,2,3,4,5,6].map(i => {
+    const el = document.getElementById(`qs-${i}`);
+    return el.value ? parseFloat(el.value) : null;
+  }).filter(v=>v!==null);
+  if(!vals.length) return;
+  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  document.getElementById('quiz-avg-display').textContent = `${avg}%`;
+  document.getElementById('quiz-badge').style.display = avg>=70 ? 'inline-block' : 'none';
+  document.getElementById('quiz-warn').style.display = avg<70 ? 'inline-block' : 'none';
+}
+
+function calcWeekScore() {
+  const inputs = document.querySelectorAll('#weekly .score-val');
+  let sum = 0, cnt = 0;
+  inputs.forEach(inp => { if(inp.value){ sum+=parseFloat(inp.value); cnt++; } });
+  if(cnt===5) {
+    document.getElementById('week-total').textContent = `${sum}/50`;
+    document.getElementById('week-ok').style.display = sum>=32 ? 'inline-block' : 'none';
+  }
+}
+
+// Month bars
+function updateMonthBar(inp, idx, target) {
+  const val = Math.min(parseFloat(inp.value)||0, 100);
+  const pct = Math.min((val/target)*100, 100);
+  document.getElementById(`mb-${idx}`).style.width = pct+'%';
+}
+
+// Month streak
+function buildMonthStreak() {
+  const cont = document.getElementById('month-streak');
+  let html = '';
+  for(let i=0; i<28; i++) {
+    html += `<div class="streak-day" id="msd-${i}" onclick="cycleMSD(${i})">${i+1}</div>`;
+  }
+  cont.innerHTML = html;
+}
+const msdState = {};
+function cycleMSD(i) {
+  msdState[i] = ((msdState[i]||0)+1)%3;
+  const el = document.getElementById(`msd-${i}`);
+  el.classList.remove('done-s','skip');
+  if(msdState[i]===1){ el.classList.add('done-s'); el.textContent='✓'; }
+  else if(msdState[i]===2){ el.classList.add('skip'); el.textContent='✗'; }
+  else { el.textContent = i+1; }
+  const done = Object.values(msdState).filter(v=>v===1).length;
+  document.getElementById('streak-done').textContent = `${done} done`;
+  const pct = Math.round((done/28)*100);
+  const badge = document.getElementById('streak-pct');
+  badge.textContent = `${pct}%`;
+  badge.className = pct>=80 ? 'tag tag-green' : pct>=60 ? 'tag tag-amber' : 'tag tag-red';
+}
+
+// Set today's date
+document.getElementById('log-date').valueAsDate = new Date();
+
+// Init
+buildTracker();
+buildWeekGrid();
+buildMonthStreak();
+
+// ==========================================
+// BACKEND INTEGRATION (FastAPI)
+// ==========================================
+
+const BACKEND_URL = "https://adhd-gate-dashboard.onrender.com";
+
+async function saveDashboardData() {
+  const getFocus = (sessionIndex) => {
+    const row = document.getElementById(`focus-s${sessionIndex}`);
+    if (!row) return null;
+    const selected = row.querySelector('.sel, .sel-g');
+    if (selected) {
+      return selected.innerText.replace(/[^\w\s]/gi, '').trim();
+    }
+    return null;
+  };
+
+  const getSessionInputs = (sessionIndex) => {
+    const block = document.getElementById(`ts-${sessionIndex}`);
+    if (!block) return [];
+    return Array.from(block.querySelectorAll('.t-input')).map(inp => inp.value);
+  };
+
+  const s0 = getSessionInputs(0);
+  const s1 = getSessionInputs(1);
+  const s2 = getSessionInputs(2);
+  const s3 = getSessionInputs(3);
+  const s4 = getSessionInputs(4);
+
+  const payload = {
+    log_date: document.getElementById('log-date')?.value || new Date().toISOString().split('T')[0],
+    session1_done: doneSessions[0],
+    session1_topic: s0[0] || null,
+    session1_resource: s0[1] || null,
+    session1_focus: getFocus(0),
+    session2_done: doneSessions[1],
+    session2_topic: s1[0] || null,
+    session2_score: s1[1] ? parseFloat(s1[1]) : null,
+    session2_correct: s1[2] || null,
+    session3_done: doneSessions[2],
+    session3_topic: s2[0] || null,
+    session3_resource: s2[1] || null,
+    session3_focus: getFocus(2),
+    session4_done: doneSessions[3],
+    session4_topic: s3[0] || null,
+    session4_focus: getFocus(3),
+    session5_done: doneSessions[4],
+    session5_topic: s4[0] || null,
+    session5_score: s4[1] ? parseFloat(s4[1]) : null,
+    sessions_completed: doneSessions.filter(Boolean).length,
+    quiz_average: parseFloat(document.getElementById('avg-score')?.textContent) || null,
+  };
+
+  console.log("Attempting to save this data to the database:", payload);
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/entries`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      alert("✅ Dashboard saved to database successfully!");
+    } else {
+      const errorText = await response.text();
+      alert("❌ Error saving dashboard. Check console.");
+      console.error("Backend Error:", errorText);
+    }
+  } catch (error) {
+    console.error("Network error:", error);
+    alert("❌ Could not connect to the backend. Is your FastAPI server running?");
+  }
+}
+</script>
+</body>
+</html>
