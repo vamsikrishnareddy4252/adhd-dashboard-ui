@@ -1390,55 +1390,53 @@ buildMonthStreak();
 
 const BACKEND_URL = "https://adhd-gate-dashboard.onrender.com";
 
+// ... (keep all your existing functions like show, toggle, pick, buildTracker, etc.) ...
+
 async function saveDashboardData() {
   const getFocus = (sessionIndex) => {
     const row = document.getElementById(`focus-s${sessionIndex}`);
     if (!row) return null;
     const selected = row.querySelector('.sel, .sel-g');
-    if (selected) {
-      return selected.innerText.replace(/[^\w\s]/gi, '').trim();
-    }
-    return null;
+    return selected ? selected.innerText.replace(/[^\w\s]/gi, '').trim() : null;
   };
 
+  // Improved payload mapping to ensure no N/A values in history
   const payload = {
     log_date: document.getElementById('log-date')?.value || new Date().toISOString().split('T')[0],
     log_day: document.getElementById('log-day')?.value || null,
-    morning_energy: document.getElementById('energy-pick').querySelector('.sel, .sel-g')?.innerText || null,
+    morning_energy: document.getElementById('energy-pick').querySelector('.sel, .sel-g')?.innerText.replace(/[^\w\s]/gi, '').trim() || null,
     
     session1_done: doneSessions[0],
-    session1_topic: document.getElementById('inp-s0-f0')?.value || null,
+    session1_topic: document.getElementById('inp-s0-f0')?.value || "Not specified",
     session1_resource: document.getElementById('inp-s0-f1')?.value || null,
-    session1_focus: getFocus(0),
+    session1_focus: getFocus(0) || "Neutral",
     
     session2_done: doneSessions[1],
-    session2_topic: document.getElementById('inp-s1-f0')?.value || null,
+    session2_topic: document.getElementById('inp-s1-f0')?.value || "Practice",
     session2_score: document.getElementById('score-s1')?.value ? parseFloat(document.getElementById('score-s1').value) : null,
     session2_correct: document.getElementById('correct-s1')?.value || null,
     
     session3_done: doneSessions[2],
-    session3_topic: document.getElementById('inp-s2-f0')?.value || null,
+    session3_topic: document.getElementById('inp-s2-f0')?.value || "Novelty Topic",
     session3_resource: document.getElementById('inp-s2-f1')?.value || null,
-    session3_focus: getFocus(2),
+    session3_focus: getFocus(2) || "Neutral",
     
     session4_done: doneSessions[3],
-    session4_topic: document.getElementById('inp-s3-f0')?.value || null,
-    session4_focus: getFocus(3),
+    session4_topic: document.getElementById('inp-s3-f0')?.value || "Active Learning",
+    session4_focus: getFocus(3) || "Neutral",
     
     session5_done: doneSessions[4],
-    session5_topic: document.getElementById('inp-s4-f0')?.value || null,
+    session5_topic: document.getElementById('inp-s4-f0')?.value || "Review",
     session5_score: document.getElementById('score-s4')?.value ? parseFloat(document.getElementById('score-s4').value) : null,
     
     sessions_completed: doneSessions.filter(Boolean).length,
-    quiz_average: parseFloat(document.getElementById('avg-score')?.textContent) || null,
+    quiz_average: parseFloat(document.getElementById('avg-score')?.textContent) || 0,
     
-    biggest_challenge: document.getElementById('summary-challenge')?.value || null,
-    what_helped: document.getElementById('summary-helped')?.value || null,
+    biggest_challenge: document.getElementById('summary-challenge')?.value || "None noted",
+    what_helped: document.getElementById('summary-helped')?.value || "Routine",
     what_killed_focus: document.getElementById('summary-distraction')?.value || null,
     tomorrow_topic: document.getElementById('summary-tomorrow')?.value || null
   };
-
-  console.log("Attempting to save this data to the database:", payload);
 
   try {
     const response = await fetch(`${BACKEND_URL}/entries`, {
@@ -1448,19 +1446,16 @@ async function saveDashboardData() {
     });
 
     if (response.ok) {
-      alert("✅ Dashboard saved to database successfully!");
+      alert("✅ Saved! Check the History tab now.");
+      loadHistory(); // Refresh history immediately
     } else {
-      const errorText = await response.text();
-      alert("❌ Error saving dashboard. Check console.");
-      console.error("Backend Error:", errorText);
+      alert("❌ Error saving. Check console.");
     }
   } catch (error) {
     console.error("Network error:", error);
-    alert("❌ Could not connect to the backend. Is your FastAPI server running?");
   }
 }
 
-// Fetch and display history from the database
 async function loadHistory() {
   const container = document.getElementById('history-container');
   container.innerHTML = '<p style="color:var(--muted)">Loading history...</p>';
@@ -1469,29 +1464,31 @@ async function loadHistory() {
     const response = await fetch(`${BACKEND_URL}/entries`);
     const data = await response.json();
 
-    if (data.length === 0) {
-      container.innerHTML = '<p>No entries found yet. Go save a day!</p>';
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="card"><p>No entries found. Save your first session!</p></div>';
       return;
     }
 
     container.innerHTML = data.map(entry => `
-      <div class="card" style="border-left: 4px solid var(--blue); margin-bottom: 0;">
+      <div class="card" style="border-left: 4px solid var(--blue); margin-bottom: 0.5rem;">
         <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-          <strong style="font-size:1.1rem;">${entry.log_date || 'Unknown Date'}</strong>
+          <strong style="font-size:1.1rem; color:var(--orange);">${entry.log_date || 'Date Missing'}</strong>
           <span class="tag tag-blue">${entry.sessions_completed || 0}/5 Sessions</span>
         </div>
         <div style="font-size:0.85rem; color:var(--text2); display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-          <div><strong>Focus:</strong> ${entry.session1_focus || 'N/A'}</div>
-          <div><strong>Energy:</strong> ${entry.morning_energy || 'N/A'}</div>
-          <div><strong>Quiz Avg:</strong> ${entry.quiz_average ? entry.quiz_average + '%' : 'N/A'}</div>
-          <div><strong>Biggest Win:</strong> ${entry.what_helped || 'N/A'}</div>
+          <div><strong>Primary Topic:</strong> ${entry.session1_topic || 'Various'}</div>
+          <div><strong>Energy:</strong> ${entry.morning_energy || 'Normal'}</div>
+          <div><strong>Focus:</strong> ${entry.session1_focus || 'Neutral'}</div>
+          <div><strong>Quiz Avg:</strong> ${entry.quiz_average ? entry.quiz_average + '%' : '0%'}</div>
+          <div style="grid-column: span 2; padding-top: 0.5rem; border-top: 1px solid var(--border2); color: var(--muted);">
+            <em>" ${entry.what_helped || 'No notes added.'} "</em>
+          </div>
         </div>
       </div>
     `).join('');
     
   } catch (error) {
-    console.error("Failed to load history:", error);
-    container.innerHTML = '<p style="color:red;">Error loading history. Is the backend awake?</p>';
+    container.innerHTML = '<p style="color:red;">Failed to pull data from cloud.</p>';
   }
 }
 </script>
