@@ -495,6 +495,7 @@ footer strong { color: var(--orange); }
     <button class="tab-btn active" onclick="show('overview',this)">🧠 Overview</button>
     <button class="tab-btn" onclick="show('schedule',this)">⏱️ Schedule</button>
     <button class="tab-btn" onclick="show('tracker',this)">📝 Daily Log</button>
+    <button class="tab-btn" onclick="show('history',this); loadHistory();">📜 History</button>
     <button class="tab-btn" onclick="show('weekly',this)">📅 Weekly</button>
     <button class="tab-btn" onclick="show('progress',this)">📈 Progress</button>
     <button class="tab-btn" onclick="show('emergency',this)">🆘 Emergency</button>
@@ -735,10 +736,10 @@ footer strong { color: var(--orange); }
       <div class="summary-stat"><div class="summary-num" id="focus-score">—</div><div class="summary-sub">Best Focus</div></div>
     </div>
     <div style="margin-top:0.75rem;display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-      <div class="wf-field"><label class="wf-label">Biggest Challenge</label><input class="wf-input" placeholder="What was hard?"></div>
-      <div class="wf-field"><label class="wf-label">What Helped Most</label><input class="wf-input" placeholder="What worked well?"></div>
-      <div class="wf-field"><label class="wf-label">What Killed Focus</label><input class="wf-input" placeholder="Distraction?"></div>
-      <div class="wf-field"><label class="wf-label">Tomorrow's Key Topic</label><input class="wf-input" placeholder="Plan ahead"></div>
+      <div class="wf-field"><label class="wf-label">Biggest Challenge</label><input class="wf-input" id="summary-challenge" placeholder="What was hard?"></div>
+      <div class="wf-field"><label class="wf-label">What Helped Most</label><input class="wf-input" id="summary-helped" placeholder="What worked well?"></div>
+      <div class="wf-field"><label class="wf-label">What Killed Focus</label><input class="wf-input" id="summary-distraction" placeholder="Distraction?"></div>
+      <div class="wf-field"><label class="wf-label">Tomorrow's Key Topic</label><input class="wf-input" id="summary-tomorrow" placeholder="Plan ahead"></div>
     </div>
     <div style="margin-top:1rem">
       <h3 class="card-head">🎁 Rewards Earned</h3>
@@ -749,6 +750,17 @@ footer strong { color: var(--orange); }
       </div>
     </div>
   </div>
+</div>
+
+<!-- ========== HISTORY ========== -->
+<div id="history" class="page">
+    <h2 class="sec"><span class="dot" style="background:var(--blue)"></span>Past Sessions</h2>
+    <div class="card card-blue" style="margin-bottom: 1.5rem;">
+        <small>Your recent dashboard entries pulled directly from the cloud database.</small>
+    </div>
+    <div id="history-container" style="display:flex; flex-direction:column; gap:1rem;">
+        <p style="color:var(--muted)">Loading history...</p>
+    </div>
 </div>
 
 <!-- ========== WEEKLY ========== -->
@@ -1219,10 +1231,10 @@ function buildTracker() {
         <button class="t-done-btn" id="tdb-${i}" onclick="markDone(${i})">✓ Done</button>
       </div>
       <div class="t-session-body">
-        ${s.fields.map(f => `
+        ${s.fields.map((f, fIdx) => `
           <div class="t-field">
             <div class="t-label">${f}</div>
-            <input class="t-input" placeholder="Enter ${f.toLowerCase()}...">
+            <input class="t-input" id="inp-s${i}-f${fIdx}" placeholder="Enter ${f.toLowerCase()}...">
           </div>
         `).join('')}
         ${s.hasScore ? `
@@ -1232,7 +1244,7 @@ function buildTracker() {
           </div>
           <div class="t-field">
             <div class="t-label">Qs Correct / Total</div>
-            <input class="t-input" placeholder="e.g. 4/6">
+            <input class="t-input" id="correct-s${i}" placeholder="e.g. 4/6">
           </div>
         ` : ''}
         ${s.hasFocus ? `
@@ -1261,7 +1273,6 @@ function markDone(i) {
 function updateSummary() {
   const cnt = doneSessions.filter(Boolean).length;
   document.getElementById('done-count').textContent = `${cnt}/5`;
-  // quiz avg from sessions 2 and 5
   const scores = [1,4].map(i => {
     const el = document.getElementById(`score-s${i}`);
     return el && el.value ? parseFloat(el.value) : null;
@@ -1275,7 +1286,7 @@ function updateSummary() {
 // Build weekly session grid
 function buildWeekGrid() {
   const cont = document.getElementById('week-sessions');
-  let state = []; // 0=empty 1=done 2=skip
+  let state = [];
   for(let d=0; d<7; d++){
     state[d] = [];
     for(let s=0; s<5; s++) state[d][s] = 0;
@@ -1286,7 +1297,6 @@ function buildWeekGrid() {
       html += `<div class="streak-day" id="ws-${d}-${s}" onclick="cycleWS(${d},${s})">${s+1}</div>`;
     }
   }
-  // Add empty slots to complete 7 cols
   html += `<div style="display:none"></div><div style="display:none"></div>`;
   cont.innerHTML = html;
 }
@@ -1391,40 +1401,41 @@ async function saveDashboardData() {
     return null;
   };
 
-  const getSessionInputs = (sessionIndex) => {
-    const block = document.getElementById(`ts-${sessionIndex}`);
-    if (!block) return [];
-    return Array.from(block.querySelectorAll('.t-input')).map(inp => inp.value);
-  };
-
-  const s0 = getSessionInputs(0);
-  const s1 = getSessionInputs(1);
-  const s2 = getSessionInputs(2);
-  const s3 = getSessionInputs(3);
-  const s4 = getSessionInputs(4);
-
   const payload = {
     log_date: document.getElementById('log-date')?.value || new Date().toISOString().split('T')[0],
+    log_day: document.getElementById('log-day')?.value || null,
+    morning_energy: document.getElementById('energy-pick').querySelector('.sel, .sel-g')?.innerText || null,
+    
     session1_done: doneSessions[0],
-    session1_topic: s0[0] || null,
-    session1_resource: s0[1] || null,
+    session1_topic: document.getElementById('inp-s0-f0')?.value || null,
+    session1_resource: document.getElementById('inp-s0-f1')?.value || null,
     session1_focus: getFocus(0),
+    
     session2_done: doneSessions[1],
-    session2_topic: s1[0] || null,
-    session2_score: s1[1] ? parseFloat(s1[1]) : null,
-    session2_correct: s1[2] || null,
+    session2_topic: document.getElementById('inp-s1-f0')?.value || null,
+    session2_score: document.getElementById('score-s1')?.value ? parseFloat(document.getElementById('score-s1').value) : null,
+    session2_correct: document.getElementById('correct-s1')?.value || null,
+    
     session3_done: doneSessions[2],
-    session3_topic: s2[0] || null,
-    session3_resource: s2[1] || null,
+    session3_topic: document.getElementById('inp-s2-f0')?.value || null,
+    session3_resource: document.getElementById('inp-s2-f1')?.value || null,
     session3_focus: getFocus(2),
+    
     session4_done: doneSessions[3],
-    session4_topic: s3[0] || null,
+    session4_topic: document.getElementById('inp-s3-f0')?.value || null,
     session4_focus: getFocus(3),
+    
     session5_done: doneSessions[4],
-    session5_topic: s4[0] || null,
-    session5_score: s4[1] ? parseFloat(s4[1]) : null,
+    session5_topic: document.getElementById('inp-s4-f0')?.value || null,
+    session5_score: document.getElementById('score-s4')?.value ? parseFloat(document.getElementById('score-s4').value) : null,
+    
     sessions_completed: doneSessions.filter(Boolean).length,
     quiz_average: parseFloat(document.getElementById('avg-score')?.textContent) || null,
+    
+    biggest_challenge: document.getElementById('summary-challenge')?.value || null,
+    what_helped: document.getElementById('summary-helped')?.value || null,
+    what_killed_focus: document.getElementById('summary-distraction')?.value || null,
+    tomorrow_topic: document.getElementById('summary-tomorrow')?.value || null
   };
 
   console.log("Attempting to save this data to the database:", payload);
@@ -1432,9 +1443,7 @@ async function saveDashboardData() {
   try {
     const response = await fetch(`${BACKEND_URL}/entries`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
@@ -1448,6 +1457,41 @@ async function saveDashboardData() {
   } catch (error) {
     console.error("Network error:", error);
     alert("❌ Could not connect to the backend. Is your FastAPI server running?");
+  }
+}
+
+// Fetch and display history from the database
+async function loadHistory() {
+  const container = document.getElementById('history-container');
+  container.innerHTML = '<p style="color:var(--muted)">Loading history...</p>';
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/entries`);
+    const data = await response.json();
+
+    if (data.length === 0) {
+      container.innerHTML = '<p>No entries found yet. Go save a day!</p>';
+      return;
+    }
+
+    container.innerHTML = data.map(entry => `
+      <div class="card" style="border-left: 4px solid var(--blue); margin-bottom: 0;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+          <strong style="font-size:1.1rem;">${entry.log_date || 'Unknown Date'}</strong>
+          <span class="tag tag-blue">${entry.sessions_completed || 0}/5 Sessions</span>
+        </div>
+        <div style="font-size:0.85rem; color:var(--text2); display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+          <div><strong>Focus:</strong> ${entry.session1_focus || 'N/A'}</div>
+          <div><strong>Energy:</strong> ${entry.morning_energy || 'N/A'}</div>
+          <div><strong>Quiz Avg:</strong> ${entry.quiz_average ? entry.quiz_average + '%' : 'N/A'}</div>
+          <div><strong>Biggest Win:</strong> ${entry.what_helped || 'N/A'}</div>
+        </div>
+      </div>
+    `).join('');
+    
+  } catch (error) {
+    console.error("Failed to load history:", error);
+    container.innerHTML = '<p style="color:red;">Error loading history. Is the backend awake?</p>';
   }
 }
 </script>
