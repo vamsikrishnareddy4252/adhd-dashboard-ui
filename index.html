@@ -496,6 +496,7 @@ footer strong { color: var(--orange); }
     <button class="tab-btn" onclick="show('schedule',this)">⏱️ Schedule</button>
     <button class="tab-btn" onclick="show('tracker',this)">📝 Daily Log</button>
     <button class="tab-btn" onclick="show('history',this); loadHistory();">📜 History</button>
+    <button class="tab-btn" onclick="show('stats',this); loadStats();">📊 Stats</button>
     <button class="tab-btn" onclick="show('weekly',this)">📅 Weekly</button>
     <button class="tab-btn" onclick="show('progress',this)">📈 Progress</button>
     <button class="tab-btn" onclick="show('emergency',this)">🆘 Emergency</button>
@@ -760,6 +761,17 @@ footer strong { color: var(--orange); }
     </div>
     <div id="history-container" style="display:flex; flex-direction:column; gap:1rem;">
         <p style="color:var(--muted)">Loading history...</p>
+    </div>
+</div>
+
+<!-- ========== STATS ========== -->
+<div id="stats" class="page">
+    <h2 class="sec"><span class="dot" style="background:var(--green)"></span>Progress Analytics</h2>
+    <div class="card card-green" style="margin-bottom: 1.5rem;">
+        <small>Your learning patterns, streaks, and performance trends at a glance.</small>
+    </div>
+    <div id="stats-container" style="display:flex; flex-direction:column; gap:1rem;">
+        <p style="color:var(--muted)">Loading statistics...</p>
     </div>
 </div>
 
@@ -1400,42 +1412,48 @@ async function saveDashboardData() {
     return selected ? selected.innerText.replace(/[^\w\s]/gi, '').trim() : null;
   };
 
-  // Improved payload mapping to ensure no N/A values in history
+  // Extract quiz average more reliably
+  const getQuizAverage = () => {
+    const avgText = document.getElementById('avg-score')?.textContent || '0%';
+    const num = parseFloat(avgText.replace('%', ''));
+    return isNaN(num) ? 0 : num;
+  };
+
   const payload = {
     log_date: document.getElementById('log-date')?.value || new Date().toISOString().split('T')[0],
     log_day: document.getElementById('log-day')?.value || null,
     morning_energy: document.getElementById('energy-pick').querySelector('.sel, .sel-g')?.innerText.replace(/[^\w\s]/gi, '').trim() || null,
     
-    session1_done: doneSessions[0],
-    session1_topic: document.getElementById('inp-s0-f0')?.value || "Not specified",
-    session1_resource: document.getElementById('inp-s0-f1')?.value || null,
-    session1_focus: getFocus(0) || "Neutral",
+    session1_done: doneSessions[0] || false,
+    session1_topic: document.getElementById('inp-s0-f0')?.value?.trim() || null,
+    session1_resource: document.getElementById('inp-s0-f1')?.value?.trim() || null,
+    session1_focus: getFocus(0) || null,
     
-    session2_done: doneSessions[1],
-    session2_topic: document.getElementById('inp-s1-f0')?.value || "Practice",
+    session2_done: doneSessions[1] || false,
+    session2_topic: document.getElementById('inp-s1-f0')?.value?.trim() || null,
     session2_score: document.getElementById('score-s1')?.value ? parseFloat(document.getElementById('score-s1').value) : null,
-    session2_correct: document.getElementById('correct-s1')?.value || null,
+    session2_correct: document.getElementById('correct-s1')?.value?.trim() || null,
     
-    session3_done: doneSessions[2],
-    session3_topic: document.getElementById('inp-s2-f0')?.value || "Novelty Topic",
-    session3_resource: document.getElementById('inp-s2-f1')?.value || null,
-    session3_focus: getFocus(2) || "Neutral",
+    session3_done: doneSessions[2] || false,
+    session3_topic: document.getElementById('inp-s2-f0')?.value?.trim() || null,
+    session3_resource: document.getElementById('inp-s2-f1')?.value?.trim() || null,
+    session3_focus: getFocus(2) || null,
     
-    session4_done: doneSessions[3],
-    session4_topic: document.getElementById('inp-s3-f0')?.value || "Active Learning",
-    session4_focus: getFocus(3) || "Neutral",
+    session4_done: doneSessions[3] || false,
+    session4_topic: document.getElementById('inp-s3-f0')?.value?.trim() || null,
+    session4_focus: getFocus(3) || null,
     
-    session5_done: doneSessions[4],
-    session5_topic: document.getElementById('inp-s4-f0')?.value || "Review",
+    session5_done: doneSessions[4] || false,
+    session5_topic: document.getElementById('inp-s4-f0')?.value?.trim() || null,
     session5_score: document.getElementById('score-s4')?.value ? parseFloat(document.getElementById('score-s4').value) : null,
     
     sessions_completed: doneSessions.filter(Boolean).length,
-    quiz_average: parseFloat(document.getElementById('avg-score')?.textContent) || 0,
+    quiz_average: getQuizAverage(),
     
-    biggest_challenge: document.getElementById('summary-challenge')?.value || "None noted",
-    what_helped: document.getElementById('summary-helped')?.value || "Routine",
-    what_killed_focus: document.getElementById('summary-distraction')?.value || null,
-    tomorrow_topic: document.getElementById('summary-tomorrow')?.value || null
+    biggest_challenge: document.getElementById('summary-challenge')?.value?.trim() || null,
+    what_helped: document.getElementById('summary-helped')?.value?.trim() || null,
+    what_killed_focus: document.getElementById('summary-distraction')?.value?.trim() || null,
+    tomorrow_topic: document.getElementById('summary-tomorrow')?.value?.trim() || null
   };
 
   try {
@@ -1446,13 +1464,18 @@ async function saveDashboardData() {
     });
 
     if (response.ok) {
-      alert("✅ Saved! Check the History tab now.");
-      loadHistory(); // Refresh history immediately
+      const saved = await response.json();
+      alert("✅ Saved! Your session has been logged. Check the History tab!");
+      loadHistory(); 
+      loadStats();
     } else {
-      alert("❌ Error saving. Check console.");
+      const error = await response.text();
+      console.error("Server error:", error);
+      alert("❌ Error saving. Please check your connection and try again.");
     }
   } catch (error) {
     console.error("Network error:", error);
+    alert("❌ Network error. Check your internet and try again.");
   }
 }
 
@@ -1470,25 +1493,178 @@ async function loadHistory() {
     }
 
     container.innerHTML = data.map(entry => `
-      <div class="card" style="border-left: 4px solid var(--blue); margin-bottom: 0.5rem;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-          <strong style="font-size:1.1rem; color:var(--orange);">${entry.log_date || 'Date Missing'}</strong>
-          <span class="tag tag-blue">${entry.sessions_completed || 0}/5 Sessions</span>
-        </div>
-        <div style="font-size:0.85rem; color:var(--text2); display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-          <div><strong>Primary Topic:</strong> ${entry.session1_topic || 'Various'}</div>
-          <div><strong>Energy:</strong> ${entry.morning_energy || 'Normal'}</div>
-          <div><strong>Focus:</strong> ${entry.session1_focus || 'Neutral'}</div>
-          <div><strong>Quiz Avg:</strong> ${entry.quiz_average ? entry.quiz_average + '%' : '0%'}</div>
-          <div style="grid-column: span 2; padding-top: 0.5rem; border-top: 1px solid var(--border2); color: var(--muted);">
-            <em>" ${entry.what_helped || 'No notes added.'} "</em>
+      <div class="card" style="border-left: 4px solid var(--blue); margin-bottom: 1.5rem;">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom: 1.5px solid var(--border2);">
+          <div>
+            <strong style="font-size:1.1rem; color:var(--orange);">${entry.log_date || 'Date Missing'}</strong>
+            <p style="font-size:0.78rem; color:var(--muted); margin-top:0.2rem;">${entry.log_day || ''}</p>
+          </div>
+          <div style="text-align:right;">
+            <span class="tag tag-blue" style="margin-left:0.5rem;">${entry.sessions_completed || 0}/5 Sessions</span>
+            ${entry.quiz_average ? `<span class="tag tag-amber" style="margin-left:0.5rem;">${entry.quiz_average}% Quiz</span>` : ''}
           </div>
         </div>
+
+        <!-- Energy & Focus Status -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div style="padding:0.75rem; background:var(--orange-light); border-radius:10px;">
+            <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:0.3rem;">Morning Energy</p>
+            <p style="font-size:0.95rem; font-weight:600; color:var(--text);">${entry.morning_energy || 'Not recorded'}</p>
+          </div>
+          <div style="padding:0.75rem; background:var(--blue-light); border-radius:10px;">
+            <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:0.3rem;">Primary Focus</p>
+            <p style="font-size:0.95rem; font-weight:600; color:var(--text);">${entry.session1_focus || 'Neutral'}</p>
+          </div>
+        </div>
+
+        <!-- Session Details -->
+        <div style="margin-bottom:1rem;">
+          <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:0.5rem;">Session Breakdown</h4>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.5rem; font-size:0.78rem;">
+            ${entry.session1_done ? `<div style="padding:0.5rem; background:var(--green-light); border-radius:8px; border-left:3px solid var(--green);"><strong>Session 1:</strong> ${entry.session1_topic || 'Topic'}</div>` : ''}
+            ${entry.session2_done ? `<div style="padding:0.5rem; background:var(--green-light); border-radius:8px; border-left:3px solid var(--green);"><strong>Session 2:</strong> ${entry.session2_topic || 'Practice'} ${entry.session2_score ? `(${entry.session2_score}%)` : ''}</div>` : ''}
+            ${entry.session3_done ? `<div style="padding:0.5rem; background:var(--green-light); border-radius:8px; border-left:3px solid var(--green);"><strong>Session 3:</strong> ${entry.session3_topic || 'Novelty'}</div>` : ''}
+            ${entry.session4_done ? `<div style="padding:0.5rem; background:var(--green-light); border-radius:8px; border-left:3px solid var(--green);"><strong>Session 4:</strong> ${entry.session4_topic || 'Active'}</div>` : ''}
+            ${entry.session5_done ? `<div style="padding:0.5rem; background:var(--green-light); border-radius:8px; border-left:3px solid var(--green);"><strong>Session 5:</strong> ${entry.session5_topic || 'Review'} ${entry.session5_score ? `(${entry.session5_score}%)` : ''}</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Key Insights -->
+        ${entry.biggest_challenge || entry.what_helped || entry.what_killed_focus ? `
+        <div style="margin-bottom:1rem; padding:1rem; background:var(--bg2); border-radius:10px; border-left:3px solid var(--orange);">
+          <h4 style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:0.5rem;">Daily Insights</h4>
+          <div style="display:grid; grid-template-columns: 1fr; gap:0.5rem; font-size:0.82rem;">
+            ${entry.biggest_challenge ? `<div><strong>🎯 Challenge:</strong> ${entry.biggest_challenge}</div>` : ''}
+            ${entry.what_helped ? `<div><strong>✨ Helped:</strong> ${entry.what_helped}</div>` : ''}
+            ${entry.what_killed_focus ? `<div><strong>⚡ Distraction:</strong> ${entry.what_killed_focus}</div>` : ''}
+            ${entry.tomorrow_topic ? `<div><strong>📚 Tomorrow's Focus:</strong> ${entry.tomorrow_topic}</div>` : ''}
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Footer -->
+        <p style="font-size:0.7rem; color:var(--dim); margin-top:0.75rem;">Logged: ${new Date(entry.created_at).toLocaleDateString()} at ${new Date(entry.created_at).toLocaleTimeString()}</p>
       </div>
     `).join('');
     
   } catch (error) {
+    console.error("Error loading history:", error);
     container.innerHTML = '<p style="color:red;">Failed to pull data from cloud.</p>';
+  }
+}
+
+async function loadStats() {
+  const container = document.getElementById('stats-container');
+  container.innerHTML = '<p style="color:var(--muted)">Loading statistics...</p>';
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/stats`);
+    const stats = await response.json();
+
+    let html = `
+      <!-- Overview Cards -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:2rem;">
+        <div class="card card-blue" style="text-align:center;">
+          <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); margin-bottom:0.3rem;">Total Entries</p>
+          <p style="font-size:2rem; font-weight:700; color:var(--blue);">${stats.total_entries}</p>
+        </div>
+        <div class="card card-green" style="text-align:center;">
+          <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); margin-bottom:0.3rem;">Total Sessions</p>
+          <p style="font-size:2rem; font-weight:700; color:var(--green);">${stats.total_sessions}</p>
+        </div>
+        <div class="card card-amber" style="text-align:center;">
+          <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); margin-bottom:0.3rem;">Average Score</p>
+          <p style="font-size:2rem; font-weight:700; color:var(--orange);">${stats.avg_quiz_score ? stats.avg_quiz_score + '%' : 'N/A'}</p>
+        </div>
+        <div class="card card-purple" style="text-align:center;">
+          <p style="font-size:0.7rem; text-transform:uppercase; color:var(--muted); margin-bottom:0.3rem;">Current Streak</p>
+          <p style="font-size:2rem; font-weight:700; color:var(--purple);">${stats.current_streak} days</p>
+        </div>
+      </div>
+
+      <!-- Energy Distribution -->
+      <div class="card" style="margin-bottom:2rem;">
+        <h3 class="card-head">Energy Levels Tracked</h3>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem;">
+          <div style="text-align:center; padding:1rem; background:var(--orange-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">High Energy</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--orange);">${stats.energy_high}</p>
+          </div>
+          <div style="text-align:center; padding:1rem; background:var(--blue-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Medium Energy</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--blue);">${stats.energy_med}</p>
+          </div>
+          <div style="text-align:center; padding:1rem; background:var(--red-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Low Energy</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--red);">${stats.energy_low}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focus Distribution -->
+      ${Object.keys(stats.focus_distribution).length > 0 ? `
+      <div class="card" style="margin-bottom:2rem;">
+        <h3 class="card-head">Focus Distribution</h3>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem;">
+          <div style="text-align:center; padding:1rem; background:var(--green-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Deep Focus</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--green);">${stats.focus_distribution.DEEP || 0}</p>
+          </div>
+          <div style="text-align:center; padding:1rem; background:var(--blue-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Okay Focus</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--blue);">${stats.focus_distribution.OK || 0}</p>
+          </div>
+          <div style="text-align:center; padding:1rem; background:var(--red-light); border-radius:10px;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Scattered</p>
+            <p style="font-size:1.8rem; font-weight:700; color:var(--red);">${stats.focus_distribution.SCATTERED || 0}</p>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Top Topics -->
+      ${stats.top_topics && stats.top_topics.length > 0 ? `
+      <div class="card" style="margin-bottom:2rem;">
+        <h3 class="card-head">Most Studied Topics</h3>
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          ${stats.top_topics.map((t, i) => `
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <div style="width:30px; height:30px; background:var(--orange); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem;">${i+1}</div>
+              <div style="flex:1;">
+                <p style="font-weight:600; color:var(--text);">${t.topic}</p>
+                <div style="height:6px; background:var(--border2); border-radius:3px; margin-top:0.3rem; overflow:hidden;">
+                  <div style="height:100%; width:${Math.min((t.count / Math.max(...stats.top_topics.map(x=>x.count))) * 100, 100)}%; background:var(--orange);"></div>
+                </div>
+              </div>
+              <span style="font-weight:700; color:var(--orange); min-width:30px; text-align:right;">${t.count}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Streaks -->
+      <div class="card">
+        <h3 class="card-head">Streak Records</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+          <div style="padding:1rem; background:var(--green-light); border-radius:10px; text-align:center;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Best Streak Ever</p>
+            <p style="font-size:2rem; font-weight:700; color:var(--green);">${stats.best_streak}</p>
+          </div>
+          <div style="padding:1rem; background:var(--blue-light); border-radius:10px; text-align:center;">
+            <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.3rem;">Avg Sessions/Day</p>
+            <p style="font-size:2rem; font-weight:700; color:var(--blue);">${stats.avg_sessions_per_day || 0}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error("Error loading stats:", error);
+    container.innerHTML = '<p style="color:red;">Failed to load statistics.</p>';
   }
 }
 </script>
